@@ -25,12 +25,14 @@ typedef struct SeqList
 void SeqListInit(SL *ps)
 {
 	ps->a = NULL;
-	ps->capaticy = ps->size = 0;
+	ps->capaticy =0;
+	ps->size = 0;
 }
 //打印顺序表
 void SeqListPrint(SL *ps)
 {
-	for(int i=0;i<ps->size;i++){
+	int i = 0;
+	for(i=0;i<ps->size;i++){
 		printf("%d ",ps->a[i]);
 	}
 	printf("\n");
@@ -48,7 +50,7 @@ void SeqCheckList(SL *ps)
 	//如果没有空间或者空间不足，则扩容
 	if(ps->size == ps->capaticy){
 		int newcapaticy = ps->capaticy ==0 ? 4 : ps->capaticy*2;
-		SLDataType* tmp = (SLDataType*)relloc(ps->a,newcapaticy*sizeof(SLDataType));
+		SLDataType* tmp = (SLDataType*)realloc(ps->a,newcapaticy*sizeof(SLDataType));
 		//判断申请动态内存空间是否成功
 		if(tmp == NULL){
 			printf("relloc fail\n");
@@ -72,10 +74,7 @@ void SeqListPushBack(SL *ps,SLDataType x)
 	SeqCheckList(ps);
 	//直接插入
 	ps->a[ps->size] = x;
-	ps->size++;
-
-	//销毁顺序表
-	DestloryList(ps);
+	ps->size++;	
 }
 //顺序表尾部删除数据
 /*
@@ -128,8 +127,8 @@ void SeqListPopFront(SL *ps)
 //顺序表查找数据的位置，找到了就返回x的下标，没有找到就返回-1
 int SeqListFind(SL *ps,SLDataType x)
 {
-	
-	for(int i=0;i<ps->size;i++){
+	int i = 0;
+	for(i=0;i<ps->size;i++){
 		if(x==ps->a[i]){
 			return i;
 		}
@@ -140,13 +139,13 @@ int SeqListFind(SL *ps,SLDataType x)
 void SeqListInsert(SL *ps,int pos,SLDataType x)
 {
 	//判断是否是头部插入还是尾部插入
-	if(pos=0){//如果指定位置是头部
+	if(pos==-1){//如果指定位置是头部
 		SeqCheckList(ps);//检查是否需要扩容
 		SeqListPushFront(ps,x);
-	}else if(pos = ps->size-1){//如果指定位置是尾部
+	}else if(pos == ps->size-1){//如果指定位置是尾部
 		SeqCheckList(ps);//检查是否需要扩容
 		SeqListPushBack(ps,x);
-	}else if(pos>=ps->size){
+	}else if(pos>ps->size-1){
 		printf("顺序表只允许按顺序依次插入数据\n");
 	}else{
 		//从后往前向后挪动数据
@@ -156,20 +155,19 @@ void SeqListInsert(SL *ps,int pos,SLDataType x)
 			end--;
 		}
 		//指定pos位置插入
-		ps->a[pos] = x;
+		ps->a[pos+1] = x;
 		ps->size++;
 	}
-
 }
 //顺序表删除指定位置的数据
 void SeqListErase(SL *ps,int pos)
 {
 	//判断顺序表是否为空
-	assert(ps->size<0);
+	assert(ps->size>0);
 	//判断是否为头部删除或者是尾部删除或者指定位置没有数据
-	if(pos=0){//如果指定位置是头部
+	if(pos==0){//如果指定位置是头部
 		SeqListPopFront(ps);
-	}else if(pos = ps->size-1){//如果指定位置是尾部
+	}else if(pos == ps->size-1){//如果指定位置是尾部
 		SeqListPopBack(ps);
 	}else if(pos>=ps->size){//如果指定位置没有数据
 		printf("此位置没有数据可删除\n");
@@ -181,8 +179,6 @@ void SeqListErase(SL *ps,int pos)
 		ps->size--;
 	}
 }
-
-
 int main()
 {
 	SL sl;
@@ -190,6 +186,32 @@ int main()
 	SeqListInit(&sl);
 	//测试尾插
 	SeqListPushBack(&sl,1);
+	SeqListPushBack(&sl,2);
+	SeqListPushBack(&sl,3);
+	SeqListPushBack(&sl,4);
+	SeqListPushBack(&sl,5);
+	//测试打印
+	SeqListPrint(&sl);
+	//测试尾删
+	SeqListPopBack(&sl);
+	SeqListPrint(&sl);
+	//测试头插
+	SeqListPushFront(&sl,9);
+	SeqListPrint(&sl);
+	//测试头删
+	SeqListPopFront(&sl);
+	SeqListPrint(&sl);
+	//测试查找数据的位置
+	int tmp = SeqListFind(&sl,5);
+	printf("%d\n",tmp);
+	//测试指定位置删除数据
+	SeqListErase(&sl,2);
+	SeqListPrint(&sl);
+	//测试指定位置插入数据
+	SeqListInsert(&sl,0,9);
+	SeqListPrint(&sl);
+	//销毁顺序表
+	SeqDestloryList(&sl);
 
 	return 0;
 }
